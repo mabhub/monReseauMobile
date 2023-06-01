@@ -32,6 +32,7 @@ var territoireSelectionne;
 
 var layersVisible = [];
 
+const mapboxgl = maplibregl;
 var popupInfo = new mapboxgl.Popup({ closeButton: false, closeOnClick: false }); //Site Info popup
 
 if (emphaseTerritory == "timezone") emphaseTerritory = devinerTerritoire();
@@ -46,6 +47,9 @@ if (!mapboxgl.supported()) {
   alert("Votre navigateur Internet ne permet pas d’afficher la carte MapBox.\nTrouvez à cette adresse les navigateurs compatibles :\nhttps://www.mapbox.com/help/mapbox-browser-support/\nVous pouvez tout de même consulter les données de graphes");
 } else {
   mapboxgl.accessToken = mapBoxToken;
+
+  const protocol = new pmtiles.Protocol();
+  mapboxgl.addProtocol('pmtiles',protocol.tile);
 
   var mapParams = construireMapParams();
   map = new mapboxgl.Map(mapParams);
