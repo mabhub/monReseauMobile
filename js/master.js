@@ -3,7 +3,7 @@
 /* global territoires, operateurs, mbData, listeVoies */
 /* global chartsGenerator */
 
-var emphasePublication = "QoS";
+var emphasePublication = "couverture";
 var emphaseTerritory = "timezone" ;
 var emphaseNew = "boutonSelectionTerritoire" ;
 
@@ -23,7 +23,9 @@ var map;
 var geocoder;
 var noPopup = false;
 var successRateThreshold = [0, 0.3, 0.7];
-var bitrateThresholdExtended = [0, 1, 1000, 3000, 8000, 9999999]
+var bitrateThresholdExtended = [0, 1, 1000, 3000, 8000, 9999999];
+// Poi - Axes ferrés - Axes routiers prioritaires - Axes routiers priioritaires 5G
+var zac = [0,0,0,0];
 
 
 var territoireSelectionne;
@@ -85,7 +87,24 @@ if (!mapboxgl.supported()) {
   map.addControl(new mapboxgl.ScaleControl({ maxWidth: 80, unit: 'metric'}));// Add scale
   map.on('load', initMap);
   map.on('dblclick', function (e) { afficherPoisson(e); });
-  map.on('mousemove', function (e) { mapMouseHandler(e); });
+  map.on('mousemove', function (e) { mapMouseHandler(e); editLinkMci();});
+  map.on('zoomend', warnOnZoom);
+
+  // Loader [06 - 07 - 2022]
+  map.on('moveend', () => { 
+    $(".lds-dual-ring").css('visibility','visible'); 
+    $(".load-done").css('visibility','hidden');
+    $("#loader .background").css('border','3px solid rgba(0, 0, 0, 0.2)');
+    $("#loader").addClass('unload');
+    $("#loader").removeClass('loaded');
+  });
+  map.on('idle', () => { 
+    $(".lds-dual-ring").css('visibility','hidden');
+    $(".load-done").css('visibility','visible');
+    $("#loader .background").css('border','3px solid rgba(186, 253, 92, 0.8)');
+    $("#loader").addClass('loaded');
+    $("#loader").removeClass('unload');
+  });
 }
 
 function construireMapParams(){
@@ -111,6 +130,7 @@ function initMap(){
 
   randomOperateur();
   activerMenuParDefaut();
+
 }
 
 function activerMenuParDefaut(){
@@ -139,26 +159,39 @@ function afficherPoisson(e){
 
 function mapMouseHandler(e){
   if (layersVisible.indexOf(territoireSelectionne.key+"_sites") > -1) {
+    var typeOfPopup = "site-popup";
     var features = map.queryRenderedFeatures(e.point, {
       layers: [territoireSelectionne.key+"_sites"]
     });
 
     if (features.length !== 1) {
+      features = map.queryRenderedFeatures(e.point, {
+        layers: ["metropole_POI"]
+      });
+      typeOfPopup = "poi-popup";
+    }
+    if (features.length !== 1) {
       popupInfo.remove();
       return;
     }
-    var feature = features[0];
-    // Populate the popup and set its coordinates based on the feature found.
-    if (!popupInfo.isOpen() || popupInfo.getLngLat() !== feature.geometry.coordinates)
-      //ajout sites 5G
+
+    if (typeOfPopup == "site-popup") {
+      feature = features[0];
       popupInfo.setLngLat(feature.geometry.coordinates)
         .setHTML(createPopup(feature.properties))
         .addTo(map);
-  } else {
+    }
+    else if (typeOfPopup == "poi-popup") {
+      feature = features[0];
+      popupInfo.setLngLat(feature.geometry.coordinates)
+        .setHTML(createPopupPoi(feature))
+        .addTo(map);
+    }
+  }
+  else {
     popupInfo.remove();
   }
 
-  // getIconeOperateur(feature.properties.Operateur) + "Emetteur " + getTechnosInstalleesSite(feature.properties.C2G, feature.properties.C3G, feature.properties.C4G, feature.properties.C5G700, feature.properties.C5G2100, feature.properties.C5G3500)
 }
 
 function getIconeOperateur(value) {
@@ -286,6 +319,7 @@ function afficherCouches() {
       setLayerVisible(layerName);
       setLayerVisible(territoireSelectionne.key+"_sites");
       setSitesCouvFilter();
+      displayZac();
     } 
     else if (couvertureQoS == "QoS") {
       if (driveCrowd == "drive") var layerName = [territoireSelectionne.key, "QoS", agglosTransports, qosVoixData, fournisseur].join('_');
@@ -358,6 +392,8 @@ function initialiserActionsBoutonsCouverture(){
   document.getElementById("bouton3G").addEventListener("click", activerMenu3G);
   document.getElementById("bouton4G").addEventListener("click", activerMenu4G);
   document.getElementById("bouton5G").addEventListener("click", activerMenu5G);
+
+  $(".input-switch").prop('checked', false);
 }
 
 function initialiserActionsBoutonsQoS(){
@@ -457,6 +493,9 @@ function activerMenuCarteData() {
     if (territoireSelectionne.key == "metropole"){
       ["bouton3G","bouton4G", "bouton5G"].forEach(function(el){setElVisible(el)});
     }
+    else if (territoireSelectionne.key == "la_reunion") {
+      ["bouton3G","bouton4G", "bouton5G"].forEach(function(el){setElVisible(el)});
+    }
     else {
       ["bouton3G","bouton4G"].forEach(function(el){setElVisible(el)});
     }
@@ -554,7 +593,13 @@ function activerMenu5G() {
     setElInvisible("ZoneGraphiquesCouvGraph");
     setElVisible("ZoneGraphiquesSitesGraph");
 
-    chartsGenerator();
+    if (territoireSelectionne.key == "la_reunion") {
+      chartsGenerator();
+      $("#5G-DOM-new").css("visibility","visible");
+    }
+    else {
+      chartsGenerator();
+    }
 
     majLegendeCouverture();
     afficherLegendeCarte();
@@ -696,7 +741,7 @@ function activerMenuQoSAgglosData(){
     qosVoixData = "data";
     setElInvisible("ZoneGraphiquesQoSAgglosVoixSMS");
     chartsGenerator();
-    setElVisible("ZoneGraphiquesQoSAgglosData");
+    showBiterateExceptStbStm("ZoneGraphiquesQoSAgglosData");
     gererAffichageGraphesQoSAgglosData_Web_Video();
     completerFournisseurDonnees();
     afficherCouches();
@@ -754,7 +799,7 @@ function activerMenuQoSTransportsVoixSMS() {
     setElInvisible("ZoneGraphiquesQoSTransportsData");
     completerFournisseurDonnees();
     chartsGenerator();
-    setElVisible("ZoneGraphiquesQoSTransportsVoixSMS");
+    showTransportVoixExceptStbStm();
     afficherLegendeCarte();
     afficherCouches();
     majLegendeCouverture();
@@ -1415,7 +1460,115 @@ function addMbLayer(value) {
   else if (value == "point") addPointLayer();
   else if (value.indexOf("_sites") !== -1) addSitesLayer(value);
   else if (value.indexOf("QoS") != -1 || value.indexOf("crowd") != -1) addQoSLayer(value);
+  else if (value.indexOf("_POI") != -1) addPOILayer(value);
+  else if (value.indexOf("_ARP") != -1) addARPLayer(value);
+  else if (value.indexOf("_RAILS") != -1) addRailsLayer(value);
+  else if (value.indexOf("_ROADS_5G") != -1) addRoads5GLayer(value);
   else addLayerCouverture(value); //Layers Couverture 2G, 3G, 4G
+}
+
+function addRoads5GLayer(id) {
+  var mbLayer = mbData.layers[mbData.layersHashTable[id]];
+
+  if (map.getSource(mbLayer.source) == null) addMbSource(mbLayer.source);
+
+  map.addLayer({
+    "id": mbLayer.id,
+    "type": "line",
+    //"minzoom": 10,
+    "source": mbLayer.source,
+    "source-layer": mbLayer.sourceLayer,
+    "layout": {
+      "visibility": "none",
+    },
+    'paint': {
+      'line-color': '#161543',
+      'line-width': 2,
+      'line-opacity': 0.55
+      }
+  });
+}
+
+function addRailsLayer(id) {
+  var mbLayer = mbData.layers[mbData.layersHashTable[id]];
+
+  if (map.getSource(mbLayer.source) == null) addMbSource(mbLayer.source);
+
+  map.addLayer({
+    "id": mbLayer.id,
+    "type": "line",
+    //"minzoom": 10,
+    "source": mbLayer.source,
+    "source-layer": mbLayer.sourceLayer,
+    "layout": {
+      "visibility": "none",
+    },
+    'paint': {
+      'line-color': '#03544d',
+      'line-width': 2,
+      'line-opacity': 0.55,
+      "line-dasharray": [2, 2]
+      }
+  });
+}
+
+function addARPLayer(id) {
+  var mbLayer = mbData.layers[mbData.layersHashTable[id]];
+
+  if (map.getSource(mbLayer.source) == null) addMbSource(mbLayer.source);
+
+  map.addLayer({
+    "id": mbLayer.id,
+    "type": "line",
+    //"minzoom": 10,
+    "source": mbLayer.source,
+    "source-layer": mbLayer.sourceLayer,
+    "layout": {
+      "visibility": "none",
+    },
+    'paint': {
+      'line-color': '#71201d',
+      'line-width': 2,
+      'line-opacity': 0.55
+      }
+  });
+}
+
+function addPOILayer(id) {
+  var mbLayer = mbData.layers[mbData.layersHashTable[id]];
+
+  if (map.getSource(mbLayer.source) == null) addMbSource(mbLayer.source);
+
+  /*map.addLayer({
+    "id": mbLayer.id,
+    "source": mbLayer.source,
+    "source-layer": mbLayer.sourceLayer,
+    "type": "circle",
+    'paint': {
+      'circle-radius': {
+        'base': 2.5,
+        'stops': [
+          [4, 2.5],
+          [12, 8],
+          [15, 10]
+        ],
+      },
+      "circle-blur": 0.1,
+      "circle-opacity": 0.8
+    }
+  });*/
+
+  map.addLayer({
+    "id": mbLayer.id,
+    "type": "symbol",
+    "source": mbLayer.source,
+    "source-layer": mbLayer.sourceLayer,
+    "layout": {
+      "visibility": "none",
+      "icon-image": "circle-stroked-15"
+      //"icon-image": "target"
+    }
+  });
 }
 
 function addLayerCouverture(value){
@@ -1617,7 +1770,11 @@ function setAllLayersInvisible() {
 
 function setElVisible(value) {
   var element = document.getElementById(value);
-  if(element != undefined) element.style.display = "block";
+
+  if (value == "ZoneGraphiquesSitesGraph" || value == "ZoneGraphiquesCouvGraph" || value == "ZoneGraphiquesQoSAgglosData" || value == "ZoneGraphiquesQoSAgglosVoixSMS" || value == "ZoneGraphiquesQoSTransportsVoixSMS" || value == "ZoneGraphiquesQoSTransportsData") { element.style.display = "flex"; }
+  else {
+    if(element != undefined) element.style.display = "block";
+  }
 }
 
 function setElInvisible(value) {
@@ -1642,16 +1799,16 @@ function afficherInfo() {
   // Lien vers la page sur le calendrier des publications de l'UCIM
   var linkCalendrierPublication = "https://www.arcep.fr/cartes-et-donnees/nos-publications-chiffrees/calendrier-de-publication-des-documents-statistiques-de-larcep.html#c27617";
   // Dates : Campagne de QoS Metropole - format mmmm aaaa : minuscules
-  var startQoSMetro = "avril 2021";
-  var endQoSMetro = "septembre 2021";
+  var startQoSMetro = "mai 2022";
+  var endQoSMetro = "août 2022";
   // Dates : Campagne de QoS Outremer - format mmmm aaaa : minuscules
-  var startQoSOutremer = "octobre 2021";
-  var endQoSOutremer = "décembre 2021";
+  var startQoSOutremer = "septembre 2022";
+  var endQoSOutremer = "janvier 2023";
   // Dates : Simulation des cartes de couverture - format mmmm aaaa : minuscules
-  var dateSimulationMap4G = "31 décembre 2021";
-  var dateSimulationMap2G3G = "31 décembre 2021";
+  var dateSimulationMap4G = "31 décembre 2022";
+  var dateSimulationMap2G3G = "31 décembre 2022";
   // Dates : Emplacements des sites 5G - format mmmm aaaa : minuscules
-  var date5G = "31 décembre 2021";
+  var date5G = "30 juin 2022";
   // Infos 
   var info5G = "Sites ouverts commercialement uniquement. Informations fournies par les opérateurs.";
   var infoMap = "Cartes de couverture 2G, 3G, 4G fournies par les opérateurs.";
@@ -1739,7 +1896,7 @@ function afficherInfo() {
   // Outre-mer
   else {
     if (couvertureQoS == "couverture") {
-      info = "Cartes de couverture 2G, 3G, 4G simulées au 31/12/2021, fournies par les opérateurs.";
+      info = "Cartes de couverture 2G, 3G, 4G fournies par les opérateurs.";
       // info = "Cartes de couverture 2G, 3G simulées au 30/06/2021, carte de couverture 4G simulée au 30/09/2021, fournies par les opérateurs.";
 
       //update date
@@ -1750,7 +1907,7 @@ function afficherInfo() {
     else if (couvertureQoS == "QoS") {
       if(driveCrowd =="drive") {
         if (fournisseur == "arcep") {
-          info = "Performances mesurées par l’Arcep d'octobre à décembre 2021, avec des terminaux compatibles 4G.";
+          info = "Performances mesurées par l’Arcep avec des terminaux 2G/3G/4G.          ";
 
           //update date
           $(".date-start-voice").text(startQoSOutremer);
@@ -1802,7 +1959,7 @@ function afficherNoteSpeciale() {
     setElInvisible("renvoiObs5G");
   }
   else if (technoCarteCouverture == "5G") {
-    info = "Concernant la 5G, seuls les sites ouverts commercialement sont représentés et comptabilisés. Lorsqu'un site est équipé de plusieurs bandes de fréquences en 5G, il est comptabilisé uniquement dans la catégorie de la plus haute bande de fréquences (par exemple, un site équipé en 3,5 GHz et 700 mhz sera comptabilisé uniquement parmi les sites 3,5 GHz). La présentation de cartes de couverture prenant en compte la 5G fera l'objet de travaux complémentaires." ;
+    info = "Concernant la 5G, seuls les sites ouverts commercialement sont représentés et comptabilisés. Lorsqu'un site est équipé de plusieurs bandes de fréquences en 5G, il est comptabilisé uniquement dans la catégorie de la plus haute bande de fréquences (par exemple, un site équipé en 3,5 GHz et 700 MHz sera comptabilisé uniquement parmi les sites 3,5 GHz). La présentation de cartes de couverture prenant en compte la 5G fera l'objet de travaux complémentaires." ;
     setElVisible("renvoiObs5G");
   }
   noteSpeciale.textContent = info;
@@ -2111,8 +2268,15 @@ function selectionTerritoire(nouveauTerritoireSelectionne){
       //pour gérer affichage en métropole ou masquage en outremer du bouton 5G - à supprimer quand 5G lancée en outremer
       if (couvertureQoS == "couverture"){
         if (carteCouverture == "data"){
-          ["bouton3G", "bouton4G"].forEach(function(el){setElVisible(el)});
-          ["bouton5G"].forEach(function(el){setElInvisible(el)});
+          if (territoireSelectionne.key == "la_reunion") {
+            ["bouton3G", "bouton4G", "bouton5G"].forEach(function(el){setElVisible(el)});
+            $("#5G-DOM-new").css("visibility","visible");
+          }
+          else {
+            ["bouton3G", "bouton4G"].forEach(function(el){setElVisible(el)});
+            ["bouton5G"].forEach(function(el){setElInvisible(el)});
+            $("#5G-DOM-new").css("visibility","hidden");
+          }
           activerMenu4G();
         }
       } 
@@ -2150,6 +2314,7 @@ function selectionTerritoire(nouveauTerritoireSelectionne){
       if (couvertureQoS == "couverture") {
         if (carteCouverture == "data"){
           ["bouton3G", "bouton4G", "bouton5G"].forEach(function(el){setElVisible(el)});
+          $("#5G-DOM-new").css("visibility","hidden");
         }
       }
       // fin gestion masque/affichage
@@ -2385,9 +2550,9 @@ function choisirFournisseurDonnees(refresh, keepFournisseur) {
     //ajout pour gérer la disparition du disclaimer sur les données tierces
     if (qosVoixData == "data") {
       setElVisible("ZoneGraphiquesQoSTransportsData");
-      setElVisible("ZoneGraphiquesQoSAgglosData");
+      showBiterateExceptStbStm("ZoneGraphiquesQoSAgglosData");
     } else {
-      setElVisible("ZoneGraphiquesQoSTransportsVoixSMS");
+      showTransportVoixExceptStbStm();
       setElVisible("ZoneGraphiquesQoSAgglosVoixSMS");
     }
     
@@ -2800,4 +2965,204 @@ function createPopup(infoCarte) {
   ;
 
   return htmlPopup;
+}
+
+function createPopupPoi (infoCarte) {
+
+  var geometry = infoCarte.geometry.coordinates;
+  var x = Math.round(geometry[0] * 100000) / 100000;
+  var y = Math.round(geometry[1] * 100000) / 100000;
+  infoCarte = infoCarte.properties;
+
+  var poiCouvert = '<div class="poi-info poi-couvert">'
+  +'  <div class="icon"><i class="bi bi-check-circle"></i></div>'
+  +'  <div>Tous les POI de cette zone ont été déclarés couverts par les opérateurs qui en ont l’obligation</div>'
+  +'</div>';
+
+  var poiInProgress = '<div class="poi-info poi-in-progress">'
+  +'  <div class="icon"><i class="bi bi-cone-striped"></i></div>'
+  +'  <div>Tous les POI de cette zone n’ont pas encore été déclarés comme couverts par les opérateurs concernés</div>'
+  +'</div>';
+
+  var operatorContainer = "";
+
+  if (infoCarte["20801"] == 1) {
+    operatorContainer = operatorContainer + '<div class="content"><div class="logo-operator orange"></div>Orange</div>';
+  }
+  if (infoCarte["20810"] == 1) {
+    operatorContainer = operatorContainer + '<div class="content"><div class="logo-operator red"></div>SFR</div>';
+  }
+  if (infoCarte["20815"] == 1) {
+    operatorContainer = operatorContainer + '<div class="content"><div class="logo-operator grey"></div>Free</div>';
+  }
+  if (infoCarte["20820"] == 1) {
+    operatorContainer = operatorContainer + '<div class="content"><div class="logo-operator blue"></div>Bouygues Telecom</div>';
+  }
+
+  var htmlPopup = '<div class="poi-popup">'
+  + poiInProgress
+  + poiCouvert
+  + '  <div class="position">'
+  + '    <i class="bi bi-geo"></i>&nbsp;&nbsp;'
+  + '    <span>Longitude : </span>'
+  + '    <span>' + x + '</span>'
+  + '    <span> &nbsp;|&nbsp; </span>'
+  + '    <span>Latitude : </span>'
+  + '    <span>' + y + '</span>'
+  + '  </div>'
+  + '  <div class="title-container">'
+  + '    <div class="title">Point d\'intérêt</div>'
+  + '    <div class="acronyme">(POI)</div>'
+  + '  </div>'
+  + '  <div class="under-title">Opérateur(s) désigné(s) pour couvrir le POI'
+  + '  </div>'
+  + '   <div class="operator-container">'
+  + '  ' + operatorContainer
+  + '   </div>'
+  + '  <div class="under-title">Nom de la zone à couvir'
+  + '  </div>'
+  + '  <div class="content" style="text-transform: capitalize;">' + infoCarte.nom_commune.toLowerCase() + ", " + infoCarte.departement.toLowerCase() + ", " + infoCarte.region.toLowerCase()
+  + '  </div>'
+  + '  <div class="under-title">Nombre de sites pour couvrir la zone</div>'
+  + '  <div class="content">' + infoCarte["nb_sites_dossier"] + ' site(s) demandé(s)</div>'
+  + '  <div class="under-title">Arrêté(s)</div>'
+  + '  <a class="link" href="' + infoCarte.lien_arrete + '" target="_blank"><div>Arrêté publié le ' + infoCarte.date_publication_arrete + '</div></a>'
+  + '</div>'
+
+  return htmlPopup;
+}
+
+// [02 - 05 - 2022] Afficher les POI
+
+function checkZac() {
+
+  var checkContainer = $(this).find(".input-switch");
+  
+  if (checkContainer.is(":checked")) {
+    checkContainer.prop("checked", false);
+
+    if (checkContainer.attr("id") == "poiDcc") {
+      setLayerInvisible("metropole_POI");
+      zac[0] = 0;
+    }
+    else if (checkContainer.attr("id") == "axesFerres") {
+      setLayerInvisible("metropole_RAILS");
+      zac[1] = 0;
+    }
+    else if (checkContainer.attr("id") == "axesRoutiers") {
+      setLayerInvisible("metropole_ARP");
+      zac[2] = 0;
+    }
+    else if (checkContainer.attr("id") == "axesRoutiers5G") {
+      setLayerInvisible("metropole_ROADS_5G");
+      zac[3] = 0;
+    }
+  }
+  else {
+    checkContainer.prop("checked", true);
+
+    if (checkContainer.attr("id") == "poiDcc") {
+      setLayerVisible("metropole_POI");
+      zac[0] = 1;
+    }
+    else if (checkContainer.attr("id") == "axesFerres") {
+      setLayerVisible("metropole_RAILS");
+      zac[1] = 1;
+    }
+    else if (checkContainer.attr("id") == "axesRoutiers") {
+      setLayerVisible("metropole_ARP");
+      zac[2] = 1;
+    }
+    else if (checkContainer.attr("id") == "axesRoutiers5G") {
+      setLayerVisible("metropole_ROADS_5G");
+      zac[3] = 1;
+    }
+  }
+
+  warnOnZoom();
+}
+
+function displayZac () {
+  if (zac[0] == 1) { setLayerVisible("metropole_POI");}
+  else { setLayerInvisible("metropole_POI"); }
+  if (zac[1] == 1) { setLayerVisible("metropole_RAILS");}
+  else { setLayerInvisible("metropole_RAILS"); }
+  if (zac[2] == 1) { setLayerVisible("metropole_ARP"); }
+  else { setLayerInvisible("metropole_ARP"); }
+  if (zac[3] == 1) { setLayerVisible("metropole_ROADS_5G"); }
+  else { setLayerInvisible("metropole_ROADS_5G"); }
+}
+
+function warnOnZoom() {
+
+  var displayWarn = false;
+  var zoomLevel = map.getZoom();
+
+  var zoomBreakerAxesFerres = 7;
+  var zoomBreakerAxesRoutiers = 6;
+  var zoomBreakerAxesRoutiers5G = 8;
+
+  if ($("#axesFerres").is(":checked") && zoomLevel < zoomBreakerAxesFerres) { displayWarn = true }
+  else if ($("#axesRoutiers").is(":checked") && zoomLevel < zoomBreakerAxesRoutiers) { displayWarn = true }
+  else if ($("#axesRoutiers5G").is(":checked") && zoomLevel < zoomBreakerAxesRoutiers5G) { displayWarn = true }
+
+  if (displayWarn == true) {
+    $("#warningZoomContainer").css('display','flex');
+  }
+  else {
+    $("#warningZoomContainer").css('display','none');
+  }
+}
+
+function displayInfoZAC() {
+  document.getElementById("overlay").style.display = "block";
+}
+
+function hideInfoZAC() {
+  document.getElementById("overlay").style.display = "none";
+}
+
+// [06 - 07 - 2022]
+
+function editLinkMci() {
+  var zoom = Math.round(map.getZoom());
+  var lat = map.getCenter().lat;
+  var lng = map.getCenter().lng;
+
+  let mciURL = "https://maconnexioninternet.arcep.fr/" + "?lat=" + lat + "&lng=" + lng + "&zoom=" + zoom;
+  $("#lien_mci").attr("href", mciURL);
+
+}
+
+// [17-05-2023] Gestion du masquage des données de débits pour STM et STB
+// GraphiqueQoSTransports_Voix
+
+function showBiterateExceptStbStm() {
+  // Si le territoire sélectionné est l'un ou l'autre
+  if (territoireSelectionne.value == "Saint-Barthélemy" || territoireSelectionne.value == "Saint-Martin") {
+    setElVisible("ZoneGraphiquesQoSAgglosData");
+    setElInvisible("GraphiqueQoSAgglos_DebitsDl");
+    setElInvisible("GraphiqueQoSAgglos_DebitsUl");
+  }
+  else {
+    setElVisible("ZoneGraphiquesQoSAgglosData");
+    setElVisible("GraphiqueQoSAgglos_DebitsDl");
+    setElVisible("GraphiqueQoSAgglos_DebitsUl");
+    setElVisible("GraphiqueQoSAgglos_Video");
+  }
+
+  if (territoireSelectionne.value == "Saint-Barthélemy") {
+    setElInvisible("GraphiqueQoSAgglos_Video");
+  }
+}
+
+function showTransportVoixExceptStbStm() {
+  if (territoireSelectionne.value == "Saint-Barthélemy" || territoireSelectionne.value == "Saint-Martin") {
+    setElVisible("ZoneGraphiquesQoSTransportsVoixSMS");
+    setElInvisible("GraphiqueQoSTransports_Voix");
+  }
+  else {
+    setElVisible("ZoneGraphiquesQoSTransportsVoixSMS");
+    setElVisible("GraphiqueQoSTransports_Voix");
+  }
 }

@@ -22,7 +22,7 @@ var territoires = [
         "value" : "Guyane",
         "dep" : 973,
         "code" : 'gf',
-        "operateurs" : [operateurs.digicel, operateurs.orange_caraibe, operateurs.sfr_caraibe /* operateurs.free_caraibe */],
+        "operateurs" : [operateurs.digicel, operateurs.free_caraibe, operateurs.orange_caraibe, operateurs.sfr_caraibe],
         "territoire" : "drom-com",
         "logo" : "./img/logo-guyane-alpha.png",
         "map" : {
@@ -37,7 +37,7 @@ var territoires = [
         "value" : "Guadeloupe",
         "dep" : 971,
         "code" : 'gp',
-        "operateurs" : [operateurs.digicel, operateurs.orange_caraibe, operateurs.sfr_caraibe  /* operateurs.free_caraibe */],
+        "operateurs" : [operateurs.digicel, operateurs.free_caraibe, operateurs.orange_caraibe, operateurs.sfr_caraibe ],
         "territoire" : "drom-com",
         "logo" : "./img/logo-guadeloupe-alpha.png",
         "map" : {
@@ -67,7 +67,7 @@ var territoires = [
         "value" : "Martinique",
         "dep" : 972,
         "code" : 'mq',
-        "operateurs" : [operateurs.digicel, operateurs.orange_caraibe, operateurs.sfr_caraibe /* operateurs.free_caraibe */],
+        "operateurs" : [operateurs.digicel, operateurs.free_caraibe, operateurs.orange_caraibe, operateurs.sfr_caraibe],
         "territoire" : "drom-com",
         "logo" : "./img/logo-martinique-alpha.png",
         "map" : {
@@ -97,7 +97,7 @@ var territoires = [
             "value" : "Saint-Barthélemy",
             "dep" : 977,
             "code" : 'bl',
-            "operateurs" : [operateurs.dauphin, operateurs.digicel, operateurs.orange_caraibe, /* operateurs.uts , operateurs.free_caraibe,   */],
+            "operateurs" : [operateurs.dauphin, operateurs.digicel, operateurs.free_caraibe, operateurs.orange_caraibe /* operateurs.uts , */],
             "territoire" : "drom-com",
             "logo" : "./img/logo-saint-barth-alpha.png",
              "map" : {
@@ -112,7 +112,7 @@ var territoires = [
                 "value" : "Saint-Martin",
                 "dep" : 978,
                 "code" : 'mf',
-                "operateurs" : [operateurs.dauphin, operateurs.digicel, operateurs.orange_caraibe, operateurs.uts /* operateurs.free_caraibe,   */],
+                "operateurs" : [operateurs.dauphin, operateurs.digicel, operateurs.free_caraibe, operateurs.orange_caraibe, operateurs.uts],
                 "territoire" : "drom-com",
                 "logo" : "./img/logo-saint-martin-alpha.png",
                  "map" : {

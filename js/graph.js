@@ -69,9 +69,19 @@ function ajouterChartsCouvCumul_3G4G(techno){
 //ajout sites 5G
 function ajouterChartsSitesCumul_5G(techno){
   var graphSitesCumul3500only = graphiqueSitesCumul("3500only", "Sites3500only", techno);
-  var graphSitesCumulTous5G = graphiqueSitesCumul("Tous5G", "SitesTous5G", techno);
-  if (graphSitesCumul3500only != null) chartsCollection.push(new Highcharts.Chart(graphSitesCumul3500only));
-  if (graphSitesCumulTous5G != null) chartsCollection.push(new Highcharts.Chart(graphSitesCumulTous5G));
+
+  // Pas d'autres bandes de fréquences que 3,5 GHz à La Réunion
+  if (territoireSelectionne.key == "la_reunion") {
+    if (graphSitesCumul3500only != null) chartsCollection.push(new Highcharts.Chart(graphSitesCumul3500only));
+    setElInvisible("GraphiqueSitesTous5G");
+  }
+  else {
+    setElVisible("GraphiqueSitesTous5G");
+    var graphSitesCumulTous5G = graphiqueSitesCumul("Tous5G", "SitesTous5G", techno);
+    if (graphSitesCumul3500only != null) chartsCollection.push(new Highcharts.Chart(graphSitesCumul3500only));
+    if (graphSitesCumulTous5G != null) chartsCollection.push(new Highcharts.Chart(graphSitesCumulTous5G));
+  }
+
 }
 
 function ajouterChartsQoSTransportVoixSMS(features){
@@ -606,9 +616,17 @@ function graphiqueSitesCumul(texteLeg, inUnite, inTechno) {
   options.legend = { enabled : false } ;
   options.xAxis = createOptions_X_Axis();
   //valeurs à ajuster selon le nb de sites à représenter
-  if (texteLeg == "3500only") options.yAxis = createOptions_Y_Axis_max(3000);
-  else if (texteLeg == "Tous5G") options.yAxis = createOptions_Y_Axis_max(14000);
-  var bandesFrequences = [];
+
+  if (territoireSelectionne.key == "la_reunion" ) {
+    if (texteLeg == "3500only") options.yAxis = createOptions_Y_Axis_max(90);
+    else if (texteLeg == "Tous5G") options.yAxis = createOptions_Y_Axis_max(90);
+    var bandesFrequences = [];
+  }
+  else {
+    if (texteLeg == "3500only") options.yAxis = createOptions_Y_Axis_max(4000);
+    else if (texteLeg == "Tous5G") options.yAxis = createOptions_Y_Axis_max(15000);
+    var bandesFrequences = [];
+  }
 
   /* Maintenir l'ordre des bandes de fréquences */
   if (inTechno == "5G") {
@@ -622,9 +640,10 @@ function graphiqueSitesCumul(texteLeg, inUnite, inTechno) {
   
   var params = {inTechno : inTechno, bandesFrequences : bandesFrequences, inUnite : inUnite};
   var series = createOptionsSeries(type,params);
-  if(series == null) return graphiqueIndisponible("GraphiqueSites"+texteLeg, texteLeg, -7, 56);;
+  if(series == null) return graphiqueIndisponible("GraphiqueSites"+texteLeg, texteLeg, -7, 56);
   options.series = series;
   options.credits = { enabled : false };
+
   return options;
 }
 /* Version avec un seul KPI voix sur les axes (fonctionne bien)

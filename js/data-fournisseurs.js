@@ -1,7 +1,7 @@
 listeFournisseurs = [
   
   //l'ordre dans lequel ils sont renseignés est celui dans lequel ils apparaitront dans le menu déroulant 
-  {
+  /*{
     nom: "SNCF-QOSI",
     fournisseur: "Mozark",
     fournisseur_link: "https://www.5gmark.com/the-company",
@@ -15,7 +15,7 @@ listeFournisseurs = [
     info: "Mesures réalisées par QOSI pour SNCF entre août et septembre\u00a02020",
     date_start: "août 2020",
     date_end: "septembre 2020"
-  },
+  },*/
   
   {
     nom: "de QoSi (Mozark Group) - Tests de débit",
@@ -175,7 +175,7 @@ listeFournisseurs = [
     info: "Tests de débits réalisés par le syndicat mixte Gigalis au T1\u00a02020.",
     date_start: "janvier 2020",
     date_end: "mars 2020"
-  },*/
+  },
   
   {
     nom: "des Pays de la Loire - Tests de débit",
@@ -190,6 +190,48 @@ listeFournisseurs = [
     info: "Tests de débits réalisés par le syndicat mixte Gigalis de mai à septembre\u00a02020.",
     date_start: "mai 2020",
     date_end: "septembre 2020"
+  },*/
+
+  {
+    nom: "du Finistère - Tests de débit",
+    fournisseur: "Finistère",
+    fournisseur_link: "https://www.finistere.fr/4G",
+    metric_type: "download",
+    key: "finistere_2022",
+    scope: {
+      metropole_agglos_national: ["data"],
+    },
+    info: "Tests de débits réalisés par les agents du département du Finistère.",
+    date_start: "janvier 2022",
+    date_end: "septembre 2022"
+  },
+
+  {
+    nom: "des Pays de la Loire - Tests de débit",
+    fournisseur: "Pays de la Loire",
+    fournisseur_link: "https://www.paysdelaloire.fr/",
+    metric_type: "download",
+    key: "pdl2022_2",
+    scope: {
+      metropole_agglos_national: ["data"],
+    },
+    info: "Tests de débits réalisés par le syndicat mixte Gigalis de janvier à décembre\u00a02022.",
+    date_start: "janvier 2022",
+    date_end: "décembre 2022"
+  },
+
+  {
+    nom: "des Pays de la Loire - Tests appels ",
+    fournisseur: "Pays de la Loire",
+    fournisseur_link: "https://www.paysdelaloire.fr/",
+    metric_type: "voix",
+    key: "pdl2022_3",
+    scope: {
+      metropole_agglos_national: ["voix"],
+    },
+    info: "Tests voix réalisés par le syndicat mixte Gigalis de janvier à décembre\u00a02022.",
+    date_start: "janvier 2022",
+    date_end: "décembre 2022"
   },
 ]
 

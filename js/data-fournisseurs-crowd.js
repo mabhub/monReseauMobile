@@ -11,8 +11,8 @@ listeFournisseursCrowd = [
       metropole : ["data"],
     },
     info: "Mesures fournies par SpeedChecker pour le 3e trimestre 2021.",
-    date_start: "juillet 2021",
-    date_end: "septembre 2021"
+    date_start: "mars 2022",
+    date_end: "septembre 2022"
   },
   
   {
@@ -77,6 +77,62 @@ listeFournisseursCrowd = [
     info: "Données mesurées par la région Bourgogne-Franche-Comté en 2021.",
     date_start: "janvier 2021",
     date_end: "décembre 2021"
+  },
+
+  {
+    nom: "KiCapte - Débits",
+    fournisseur: "Ille-et-Vilaine",
+    fournisseur_link: "https://www.ille-et-vilaine.fr/",
+    metric_type: "download",
+    key: "crowd8",
+    scope: {
+      metropole : ["data"],
+    },
+    info: "Données mesurées par le département d'Ille-et-Vilaine et son application mobile « KiCapte »",
+    date_start: "janvier 2021",
+    date_end: "octobre 2022"
+  },
+
+  {
+    nom: "KiCapte - Tests Web",
+    fournisseur: "Ille-et-Vilaine",
+    fournisseur_link: "https://www.ille-et-vilaine.fr/",
+    metric_type: "web",
+    key: "crowd9",
+    scope: {
+      metropole : ["data"],
+    },
+    info: "Données mesurées par le département d'Ille-et-Vilaine et son application mobile « KiCapte »",
+    date_start: "janvier 2021",
+    date_end: "octobre 2022"
+  },
+
+  {
+    nom: "Ça capte ? - Débits",
+    fournisseur: "Finistère",
+    fournisseur_link: "https://www.finistere.fr/Actualites/Ca-capte-Une-application-pour-ameliorer-la-couverture-mobile-du-Finistere/(language)/fre-FR",
+    metric_type: "download",
+    key: "crowd6",
+    scope: {
+      metropole : ["data"],
+    },
+    info: "Données mesurées par le département du Finistère et son application mobile « Ça capte ? »",
+    date_start: "avril 2022",
+    date_end: "septembre 2022"
+  },
+
+  {
+    nom: "Ça capte ? - Tests Web",
+    fournisseur: "Finistère",
+    fournisseur_link: "hhttps://www.finistere.fr/Actualites/Ca-capte-Une-application-pour-ameliorer-la-couverture-mobile-du-Finistere/(language)/fre-FR",
+    metric_type: "web",
+    key: "crowd7",
+    scope: {
+      metropole : ["data"],
+    },
+    info: "Données mesurées par le département du Finistère et son application mobile « Ça capte ? »",
+    date_start: "avril 2022",
+    date_end: "septembre 2022"
   },
 ]
 

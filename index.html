@@ -87,6 +87,9 @@
       $('#boutonQoSTransportsVoixSMS').on('click', updateLegendeSMS);
       $('#boutonQoSAgglosData').on('click', updateLegendeData);
       $('#boutonQoSTransportsData').on('click', updateLegendeData);
+      $('.switch-container').on('click', checkZac);
+      $('#infoZAC').on('click',displayInfoZAC)
+      $('#overlay').on('click',hideInfoZAC)
     }
   );
   </script>
@@ -105,6 +108,35 @@
   <div id="tooltipCookie" role="tooltip">
     Gestion des cookies
     <div id="arrow" data-popper-arrow></div>
+  </div>
+
+  <div id="loader" class="unload">
+    <div class="lds-dual-ring"></div>
+    <div class="background"></div>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle load-done" viewBox="0 0 16 16">
+      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+    </svg>
+  </div>
+
+  <div id="overlay">
+    <div class="text-container">
+      <div class="header">
+        <div class="main-title">Zones à couvir</div>
+        <div class="back-button"><i class="bi bi-arrow-return-left"></i> &nbsp;Retour à la carte</div>
+      </div>
+      <div class="title">Points d'intérêt du dispositif de couverture ciblée</div>
+      <div class="text">Afin de répondre de manière ciblée et adaptée à l'ensemble des attentes des citoyens et des territoires en matière de connectivité mobile, un dispositif de couverture ciblée a été mis en place dès 2018. Il vise à améliorer de manière localisée et significative la couverture de zones dans lesquelles un besoin d'aménagement numérique du territoire a été identifié par les collectivités et le gouvernement. Ainsi, chaque opérateur sera tenu d'assurer la couverture de 5 000 nouvelles zones grâce à de nouveaux sites dont certains seront mutualisés. La carte présente les points d'intérêt ainsi que les zones identifiées par les pouvoirs publics. Lorsque vous survolez un point d'intérêt (POI) sur la carte, vous pouvez consulter des informations supplémentaires. Selon les zones, les opérateurs devront construire un ou plusieurs sites pour apporter de la couverture en voix, SMS et en 4G sur l'ensemble de la zone. Ces sites apparaîtront dès qu'ils seront mis en service. </div>
+      <a href="https://www.arcep.fr/la-regulation/grands-dossiers-reseaux-mobiles/la-couverture-mobile-en-metropole/le-new-deal-mobile.html#c31087" target="_blank" class="link"><div><i class="bi bi-box-arrow-up-right"></i> &nbsp;En savoir plus</div></a>
+      <div class="title">Axes ferrés</div>
+      <div class="text"></div>
+      <a href="https://www.arcep.fr/la-regulation/grands-dossiers-reseaux-mobiles/la-couverture-mobile-en-metropole/la-couverture-des-axes-de-transports.html" target="_blank" class="link"><div><i class="bi bi-box-arrow-up-right"></i> &nbsp;En savoir plus</div></a>
+      <div class="title">Axes routiers prioritaires</div>
+      <div class="text">Au 31 décembre 2020, Bouygues Telecom, Orange et SFR ont l’obligation de rendre disponibles les services de voix, SMS (2G/3G) et de très haut débit mobile (4G) sur l'ensemble des axes routiers prioritaires. Les axes routiers prioritaires sont définis dans les autorisations d'utilisation des fréquences délivrées aux opérateurs de réseaux mobiles métropolitains comme étant « les autoroutes, les axes routiers principaux reliant, au sein de chaque département, le chef-lieu de département (préfecture) aux chefs-lieux d’arrondissements (sous-préfectures) et les tronçons de routes sur lesquels circulent en moyenne annuelle au moins cinq mille véhicules par jour, tels qu’ils existent au 1er janvier 2018. Si plusieurs axes routiers relient un chef-lieu de département (préfecture) à un chef-lieu d’arrondissement (sous-préfecture), le titulaire est tenu d’en couvrir au moins un. »</div>
+      <a href="https://www.arcep.fr/la-regulation/grands-dossiers-reseaux-mobiles/la-couverture-mobile-en-metropole/la-couverture-des-axes-de-transports.html" target="_blank" class="link"><div><i class="bi bi-box-arrow-up-right"></i> &nbsp;En savoir plus</div></a>
+      <div class="title">Axes routiers prioritaires 5G</div>
+      <div class="text"></div>
+      <a href="https://www.arcep.fr/la-regulation/grands-dossiers-reseaux-mobiles/la-couverture-mobile-en-metropole/la-couverture-des-axes-de-transports.html" target="_blank" class="link"><div><i class="bi bi-box-arrow-up-right"></i> &nbsp;En savoir plus</div></a>
+    </div>
   </div>
 
   <img alt="Logo ARCEP" id="logo-arcep" style="z-index:1;" src="./img/logoArcep.png">
@@ -144,7 +176,7 @@
       <hr>
     </div>
     <!-- Couv ou QOS -->
-    <div class="title" style="margin-left: 10px; font-weight: bold;">Choisissez un type de mesure</div>
+    <div class="title" style="margin-left: 10px; font-weight: bold;">Choisissez un type de donnée</div>
     <div class="custom-container" id="containerBoutonCouvertureOuQoS" style="height:35px">
 
       <div class="boutonType1 boutonWidth2" id="boutonCouverture" style="margin: 0px 9px 0px 0px; position:relative;">
@@ -208,35 +240,85 @@
           <div class="boutonType1" id="bouton5G" style="height:30px; width:49px; margin: 0px 13% 0px 0px;position:relative; line-height:30px; font-size:16px; font-weight:bold; display:none;" >
             <div class="selectLight" id="selectLight5G"></div>
             <div>5G</div>
+            <span id="5G-DOM-new" class="new-label cinqG-dom-new">new</span>
           </div>
         </div>
 
       </div>
 
-      <div style="width: 60%; height: 1px; margin: 15px 20% 15px 20%; float:left;">
-        <div style="width: 100%; border-style: solid; border-width: 1px 0px 0px 0px;border-color:white; float:left;"></div>
+      <div style="width: 60%; height: 1px; margin: 15px 20% 15px 20%;">
+        <div style="width: 100%; border-style: solid; border-width: 1px 0px 0px 0px;border-color:white;"></div>
       </div>
    
-      <div id="ZoneGraphiquesCouvGraph" style="width:100%; float:left;">
+      <div id="ZoneGraphiquesCouvGraph">
         <div class="graphiqueCouv" id="GraphiqueCouvPopulation"></div>
         <div class="graphiqueCouv" id="GraphiqueCouvSurface"></div>
       </div>
         <!--ajout sites 5G-->
-      <div id="ZoneGraphiquesSitesGraph" style="width:100%; float:left;">
+      <div id="ZoneGraphiquesSitesGraph">
         <div class="graphiqueSites" id="GraphiqueSites3500only"></div>
         <div class="graphiqueSites" id="GraphiqueSitesTous5G"></div>
       </div>
         <!--fin ajout sites 5G-->
       <div class="legendeCouv"></div>
-      <div id="notes" style="display: none; text-align:justify; font-size:10px; line-height:11px; margin: 25px 0px 0px 0px; float:left; height:11px;">
+      
+      <div id="renvoiObs5G" style="display: flex;">
+        <a href="https://www.arcep.fr/cartes-et-donnees/nos-cartes/deploiement-5g.html" target="_blank" data-htmlarea-external="1" style="text-decoration: none;">
+          <div class="observatoire-5G"><i class="bi bi-clock-history"></i> &nbsp; Consulter l'historique des déploiements 5G</div>
+        </a>
+      </div>
+      <div id="notes" style="display: none; text-align:justify; font-size:10px; line-height:11px; margin: 15px 0px 0px;">
         <u>Notes</u> :
       </div>
-      <div id="noteSpeciale" style="display: none; text-align:justify; font-size:10px; line-height:11px; margin: 5px 0px 5px 0px; float:left; height:120px;">
+      <div id="noteSpeciale" style="display: none; text-align:justify; font-size:10px; line-height:11px; margin: 5px 0px 5px 0px; margin-bottom: 30px; padding-left: 10px; padding-right: 10px; padding-top: 10px;">
         <!--texte généré par master.js-->>
       </div>
-      <div id="renvoiObs5G" style="display: none; text-align:justify; font-size:10px; line-height:11px; margin: 5px 0px 5px 0px; float:left; height:120px;">Plus d'informations sur l'<a href="https://www.arcep.fr/cartes-et-donnees/nos-cartes/deploiement-5g.html" target="_blank" data-htmlarea-external="1" style="color:#ffffff">observatoire du déploiement 5G</a> de l'Arcep
-      </div>
       
+      <!-- [NF 02/05/2022]-->
+      <!-- <div id="zonesACouvrirContainer">
+        <div>Zones à couvrir</div>
+        <form>
+          <div style="display:flex;">
+            <input type="checkbox" id="pointsOfIInterest" name="poiCheckBox" value="1">
+            <label for="poiCheckBox">Points d'intérêt du dispositif de couverture ciblée</label><br>
+          </div>
+        </form>
+      </div> -->
+
+      <div class="container-zone-a-couvrir">
+        <div class="zac-title-container">
+          <div class="zac-title">Zones à couvrir</div>
+          <div class="info-button" id="infoZAC">
+            <span>+ Infos</span>
+          </div>
+        </div>
+        <div class="container-zac-switch">
+          <div class="switch-container">
+            <input type="checkbox" id="poiDcc" class="input-switch"/>
+            <label for="poi-dcc" class="label-switch">Toggle</label>
+            <div class="text-switch">Points d'intérêt du dispositif de couverture ciblée</div>
+          </div>
+          <div class="switch-container">
+            <input type="checkbox" id="axesFerres" class="input-switch"/>
+            <label for="axes-ferres" class="label-switch">Toggle</label>
+            <div class="text-switch">Axes ferrés</div>
+          </div>
+          <div class="switch-container">
+            <input type="checkbox" id="axesRoutiers" class="input-switch"/>
+            <label for="axes-routiers" class="label-switch">Toggle</label>
+            <div class="text-switch">Axes routiers prioritaires</div>
+          </div>
+          <div class="switch-container">
+            <input type="checkbox" id="axesRoutiers5G" class="input-switch"/>
+            <label for="poi-4g-fixe" class="label-switch">Toggle</label>
+            <div class="text-switch">Axes routiers prioritaires 5G</div>
+          </div>
+        </div>
+        <div id="warningZoomContainer">
+          <div class="icon"><i class="bi bi-zoom-in"></i></div>
+          <div class="text">Zommez davantage pour faire apparaître les axes demandés</div>
+        </div>
+      </div>      
     </div>
 
     <!--ajout de sélecteurs protocle Arcep VS crowd-->
@@ -282,7 +364,7 @@
 
     <div id="ZoneGraphiquesQoSAgglos">
       <div id="zoneSelectionSousStrateAgglos">
-        <div id="enteteBoutonsChoixTypeTransport" style="font-size:14px; font-weight:bold; margin: 0px 0px 0px 0px; float:left;">Par type de zones</div>
+        <div id="enteteBoutonsChoixTypeTransport" style="font-size:14px; font-weight:bold; margin: 0px 0px 0px 0px;">Par type de zones</div>
         <div id="GraphiqueQoS_ZoneGeo" style="width: 100%; height: 110px;">
 
           <div class="boutonType1" id="boutonNational" style="width:240px; margin: 5px 0px 10px 0px;position:relative;">
@@ -316,11 +398,11 @@
           </div>
         </div>
 
-        <div style="width: 60%; height: 1px; margin: 14px 20% 5px 20%; float:left;">
+        <div style="width: 60%; height: 1px; margin: 15px 20% 12px 20%;">
           <div style="width: 100%; border-style: solid; border-width: 1px 0px 0px 0px;border-color:white; float:left;"></div>
         </div>
 
-        <div id = "ZoneSelectionQoSAgglosSousStrate" class="menuDeroulantTransports" style="margin: 2px 10px 0px 2px; float:left">
+        <div id = "ZoneSelectionQoSAgglosSousStrate" class="menuDeroulantTransports" style="margin: 2px 10px 0px 2px;">
           <select id="typeMesuresAgglos">
             <option value="tous">Toutes les mesures</option>
             <option value="outdoor">À l'extérieur des bâtiments</option>
@@ -330,9 +412,9 @@
         </div>
       </div>
 
-      <div style="font-size:14px; font-weight:bold; margin: 10px 0px 0px 0px; float:left;">Par type de service</div>
+      <div style="font-size:14px; font-weight:bold; margin: 10px 0px 0px 0px;">Par type de service</div>
 
-      <div style="float:left;">
+      <div style="height: 60px;">
         <div class="boutonType1" id="boutonQoSAgglosVoixSMS" style="width:115px; margin: 5px 10px 0px 0px;position:relative;">
           <div class="selectLight" id="selectLightQoSAgglosVoixSMS"></div>
           <img alt="Icone Voix" height="25" src="./img/logoVoixSMS.png" class="logoService">
@@ -345,8 +427,8 @@
         </div>
       </div>
 
-      <div style="width: 60%; height: 1px; margin: 10px 20% 5px 20%; float:left;">
-        <div style="width: 100%; border-style: solid; border-width: 1px 0px 0px 0px;border-color:white; float:left;"></div>
+      <div style="width: 60%; height: 1px; margin: 10px 20% 5px 20%;">
+        <div style="width: 100%; border-style: solid; border-width: 1px 0px 0px 0px;border-color:white;"></div>
       </div>
 
       <!-- disclaimer données tierces -->
@@ -487,19 +569,60 @@
     <!--fin ajout zone crowd-->
 
     <div id="info">
-      
       <div class="infoContainer">
         <div class="infoTxt-title"><i class="bi bi-info-circle-fill"></i> Informations complémentaires</div>
         <div id="infoTxt"><!-- Info de publication générée ici par master.js --></div>
       </div>
+    </div>
 
-
-      <div style="font-size:9px; line-height:9px; color:#BBBBBB; text-align:center; margin: 15px 10px 10px 10px;">
-        <a href="https://www.data.gouv.fr/fr/datasets/monreseaumobile" target="_blank" data-htmlarea-external="1">OpenData</a> -
-        <a href="mailto:monreseaumobile@arcep.fr">Contact</a> -
-        <!--<a href="https://www.arcep.fr/comparer-les-operateurs-mobiles" target="_blank">En savoir plus</a>-->
-		 <a href="https://www.arcep.fr/la-regulation/grands-dossiers-reseaux-mobiles/la-qualite-des-services-mobiles/protocoles-monreseaumobile.html" target="_blank" data-htmlarea-external="1">Protocoles de mesures</a>
-
+    <div id="footer">
+      <!--<a href="https://framaforms.org/participez-a-lamelioration-du-site-mon-reseau-mobile-1655887221" target="_blank" data-htmlarea-external="1">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-balloon-heart" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="m8 2.42-.717-.737c-1.13-1.161-3.243-.777-4.01.72-.35.685-.451 1.707.236 3.062C4.16 6.753 5.52 8.32 8 10.042c2.479-1.723 3.839-3.29 4.491-4.577.687-1.355.587-2.377.236-3.061-.767-1.498-2.88-1.882-4.01-.721L8 2.42Zm-.49 8.5c-10.78-7.44-3-13.155.359-10.063.045.041.089.084.132.129.043-.045.087-.088.132-.129 3.36-3.092 11.137 2.624.357 10.063l.235.468a.25.25 0 1 1-.448.224l-.008-.017c.008.11.02.202.037.29.054.27.161.488.419 1.003.288.578.235 1.15.076 1.629-.157.469-.422.867-.588 1.115l-.004.007a.25.25 0 1 1-.416-.278c.168-.252.4-.6.533-1.003.133-.396.163-.824-.049-1.246l-.013-.028c-.24-.48-.38-.758-.448-1.102a3.177 3.177 0 0 1-.052-.45l-.04.08a.25.25 0 1 1-.447-.224l.235-.468ZM6.013 2.06c-.649-.18-1.483.083-1.85.798-.131.258-.245.689-.08 1.335.063.244.414.198.487-.043.21-.697.627-1.447 1.359-1.692.217-.073.304-.337.084-.398Z"/>
+          </svg>
+        </div>
+        <div>Aidez-nous à améliorer le site !</div>
+      </a>-->
+      <a href="https://www.arcep.fr/actualites/nos-mails-dinformation/liste-de-diffusion-mon-reseau-mobile.html " target="_blank" data-htmlarea-external="1">
+        <div><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
+          <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+        </svg>
+        </div>
+        <div>Recevoir les dernières actualités de Mon Réseau Mobile</div>
+      </a>
+      <a href="https://www.data.gouv.fr/fr/datasets/monreseaumobile" target="_blank" data-htmlarea-external="1">
+        <div><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-bar-down" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M1 3.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5zM8 6a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 .708-.708L7.5 12.293V6.5A.5.5 0 0 1 8 6z"/>
+          </svg>
+        </div>
+        <div>Télécharger les données du site</div>
+      </a>
+      <a href="https://www.arcep.fr/la-regulation/grands-dossiers-reseaux-mobiles/la-qualite-des-services-mobiles/protocoles-monreseaumobile.html" target="_blank" data-htmlarea-external="1">
+        <div><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-bar-graph" viewBox="0 0 16 16">
+          <path d="M10 13.5a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-6a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v6zm-2.5.5a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-1zm-3 0a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-1z"/>
+          <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+        </svg>
+        </div>
+        <div>Plus d'informations sur les protocoles de mesures</div>
+      </a>
+      <a id="lien_mci" target="_blank" data-htmlarea-external="1" href="">
+        <div><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hdd-network" viewBox="0 0 16 16">
+          <path d="M4.5 5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zM3 4.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"/>
+          <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2H8.5v3a1.5 1.5 0 0 1 1.5 1.5h5.5a.5.5 0 0 1 0 1H10A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5H.5a.5.5 0 0 1 0-1H6A1.5 1.5 0 0 1 7.5 10V7H2a2 2 0 0 1-2-2V4zm1 0v1a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1zm6 7.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5z"/>
+        </svg>
+        </div>
+        <div>Consulter cette carte pour les réseaux fixes</div>
+      </a>
+      <a href="mailto:monreseaumobile@arcep.fr" target="_blank" data-htmlarea-external="1">
+        <div><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
+          <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+        </svg></div>
+        <div>Contactez-nous</div>
+      </a>
+      <div id="footer-name">
+        <div class="site-name">Mon Réseau Mobile</div>
+        <div class="version">Version 1.7.9</div>
       </div>
     </div>
 
@@ -529,21 +652,21 @@
       <div style="width:136px; margin:0px 0px 0px 0px; float:left;">
         <div style="height:38px; width:38px; margin: 0px 46px 0px 46px; float:left;"><img alt="Icone Couverture" style="height:38px;" src="./img/logoCouv.png"></div>
         <div style="width:100%; margin: 2px 0px 2px 0px; font-weight:bold; font-size:12px; text-align:center; line-height:11px; float:left;">Couverture simulée</div>
-        <div style="text-align:center; font-size:10px; line-height:10px; color:#888; float:left;">Cartes de couverture simulée fournies par les opérateurs au <span style="font-weight:bold;">T4 2021</span>.</div>
+        <div style="text-align:center; font-size:10px; line-height:10px; color:#888; float:left;">Cartes de couverture simulée fournies par les opérateurs</div>
       </div>
 
       <div style="width:28px; margin:15px 0px 0px 0px; font-size:30px; text-align:center; color:#2A1D75; font-weight:bold;  line-height:80px; float:left;">+</div>
       <div style="width:136px; margin:0px 0px 0px 0px; float:left;">
         <div style="height:38px; width:38px; margin: 0px 46px 0px 46px; float:left;"><img alt="Icone Qualité de Service" style="height:38px;" src="./img/logoQoS.png"></div>
         <div style="width:100%; margin: 2px 0px 2px 0px; font-weight:bold; font-size:12px; text-align:center; line-height:11px; float:left;">Qualité mesurée</div>
-        <div style="text-align:center; font-size:10px; line-height:10px; color:#888; float:left;">Qualité mesurée sur le terrain par l’Arcep au <span style="font-weight:bold;">S2 2021</span>, et par d'autres acteurs selon des <a href="https://www.arcep.fr/fileadmin/cru-1627977896/user_upload/grands_dossiers/qualite-services-mobiles/kit-du-regulateur_2020v02.pdf" target="_blank">protocoles comparables à ceux de l'Arcep</a></div>
+        <div style="text-align:center; font-size:10px; line-height:10px; color:#888; float:left;">Qualité mesurée sur le terrain par l’Arcep, et par d'autres acteurs selon des <a href="https://www.arcep.fr/fileadmin/cru-1627977896/user_upload/grands_dossiers/qualite-services-mobiles/kit-du-regulateur_2020v02.pdf" target="_blank">protocoles comparables à ceux de l'Arcep</a></div>
       </div>
       
       <div style="width:28px; margin:15px 0px 0px 0px; font-size:30px; text-align:center; color:#2A1D75; font-weight:bold;  line-height:80px; float:left;">+</div>
       <div style="width:136px; margin:0px 0px 0px 0px; float:left;">
         <div style="height:38px; width:38px; margin: 0px 46px 0px 46px; float:left;"><img alt="Icone Partenariat" style="height:38px;" src="./img/crowd2noir.png"></div>
         <div style="width:100%; margin: 2px 0px 2px 0px; font-weight:bold; font-size:12px; text-align:center; line-height:11px; float:left;">Données crowdsourcées</div>
-        <div style="text-align:center; font-size:10px; line-height:10px; color:#888; float:left;"><span style="font-weight:bold;color:#EE5557;">En version expérimentale</span>, qualitée mesurée via le crowdsourcing</div>
+        <div style="text-align:center; font-size:10px; line-height:10px; color:#888; float:left;">Qualitée mesurée via le crowdsourcing</div>
       </div>
       
     </div>
@@ -563,8 +686,8 @@
     <div id="PopupInfosLegendeCouvVoix" style="display:block; height:auto; max-height: calc(100vh - 171px);">
       <div class="titleLegende">Couverture voix et SMS</div>
       <hr class="hrTitleLegende">
-      <div class="popupButtonClose">×</div>
-      <div class="popupContentBox" style="width:100%; max-height:inherit; overflow-y:auto;">
+      <div class="popupButtonClose"><span style="position: absolute;left: 50%;top: 50%;transform: translate(-50%, -50%);">×</span></div>
+      <div class="popupContentBox" style="width:100%; max-height: calc(-216px + 100vh); overflow-y:auto;">
         <div style="margin: 0px 0px 0px 0px;">
           <div style="color:#000000; font-size:12px;">
             <div  class="squareLegendeColor" style="background-color: #d82424;"></div><b>Très bonne couverture</b></div>
@@ -582,8 +705,8 @@
         </div>
         <div style="margin: 10px 0px 0px 0px;">
           <div style="color:#000000; font-size:12px;">
-            <div style="height:16px; width:14px; margin: 0px 5px 0px 0px; float: left;"><img alt="Icone Site" style="height:12px;" src="./img/LogoSite.png"></div><b>Emetteurs </b></div>
-            <div style="color:#000000; margin-top: 3px; margin-bottom: 5px; font-size:11px; line-height:11px;">Zoomer pour afficher et cliquer pour plus d'infos</div>
+            <div style="height:16px; width:14px; margin: 0px 5px 0px 0px; float: left;"><img alt="Icone Site" style="height:12px;" src="./img/LogoSite.png"></div><b>Sites </b></div>
+            <div style="color:#000000; margin-top: 3px; margin-bottom: 5px; font-size:11px; line-height:11px;">Zoomer pour afficher et survoler le site pour plus d'infos</div>
         </div>
         <div class="clicEnSavoirPlusCouv" style="color:#000000; font-size:10px; width:100%; text-align:center; color:#666; cursor: pointer; outline:0 none;">(<u>en savoir plus sur la couverture</u>)</div>
       
@@ -609,8 +732,8 @@
       </div>
       <div style="margin: 10px 0px 0px 0px;">
         <div style="color:#000000; font-size:12px;">
-          <div style="height:16px; width:14px; margin: 0px 5px 0px 0px; float: left;"><img alt="Icone Site" style="height:12px;" src="./img/LogoSite.png"></div><b>Emetteurs </b></div>
-          <div style="color:#000000; margin-top: 3px; margin-bottom: 5px; font-size:11px; line-height:11px;">Zoomer pour afficher et cliquer pour plus d'infos</div>
+          <div style="height:16px; width:14px; margin: 0px 5px 0px 0px; float: left;"><img alt="Icone Site" style="height:12px;" src="./img/LogoSite.png"></div><b>Sites </b></div>
+          <div style="color:#000000; margin-top: 3px; margin-bottom: 5px; font-size:11px; line-height:11px;">Zoomer pour afficher et survoler le site pour plus d'infos</div>
       </div>
       <div class="clicEnSavoirPlusCouv" style="color:#000000; font-size:10px; width:100%; text-align:center; color:#666; cursor: pointer; outline:0 none;">(<u>en savoir plus sur la couverture</u>)</div>
     
@@ -640,8 +763,8 @@
       </div>
       <div style="margin: 10px 0px 0px 0px;">
         <div style="color:#000000; font-size:12px;">
-          <div style="height:16px; width:14px; margin: 0px 5px 0px 0px; float: left;"><img alt="Icone Site" style="height:12px;" src="./img/LogoSite.png"></div><b>Emetteurs </b></div>
-          <div style="color:#000000; margin-top: 3px; margin-bottom: 5px; font-size:11px; line-height:11px;">Zoomer pour afficher et cliquer pour plus d'infos</div>
+          <div style="height:16px; width:14px; margin: 0px 5px 0px 0px; float: left;"><img alt="Icone Site" style="height:12px;" src="./img/LogoSite.png"></div><b>Sites </b></div>
+          <div style="color:#000000; margin-top: 3px; margin-bottom: 5px; font-size:11px; line-height:11px;">Zoomer pour afficher et survoler le site pour plus d'infos</div>
       </div>
       <div class="clicEnSavoirPlusCouv" style="color:#000000; font-size:10px; width:100%; text-align:center; color:#666; cursor: pointer; outline:0 none;">(<u>en savoir plus sur la couverture</u>)</div>
     
@@ -763,8 +886,8 @@
       </div>
       <div style="margin: 10px 0px 0px 0px;">
         <div style="color:#000000; font-size:12px;">
-          <div style="height:16px; width:14px; margin: 0px 5px 0px 0px; float: left;"><img alt="Icone Site" style="height:12px;" src="./img/LogoSite.png"></div><b>Emetteurs </b></div>
-          <div style="color:#000000; margin-top: 3px; margin-bottom: 5px; font-size:11px; line-height:11px;">Zoomer pour afficher et cliquer pour plus d'infos</div>
+          <div style="height:16px; width:14px; margin: 0px 5px 0px 0px; float: left;"><img alt="Icone Site" style="height:12px;" src="./img/LogoSite.png"></div><b>Sites </b></div>
+          <div style="color:#000000; margin-top: 3px; margin-bottom: 5px; font-size:11px; line-height:11px;">Zoomer pour afficher et survoler le site pour plus d'infos</div>
       </div>
       <div class="clicEnSavoirPlusCouv" style="color:#000000; font-size:10px; width:100%; text-align:center; color:#666; cursor: pointer; outline:0 none;">(<u>en savoir plus sur la couverture</u>)</div>
     

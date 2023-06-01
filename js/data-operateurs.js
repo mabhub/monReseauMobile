@@ -160,7 +160,11 @@ var operateurs = {
             BC : "#a071a2",
             TBC : "#702a74",
             ITI : "#cfb8d0",
-            RP : "#a071a2"
+            RP : "#a071a2",
+            // Ajout sites 5G
+            Sites700 : "#702a74",
+            Sites2100 : "#a071a2",
+            Sites3500 : "#cfb8d0"
         }
     },
     only : {
@@ -260,7 +264,7 @@ var operateurs = {
         }
     },
     free_caraibe : {
-        MCCMNC : 34009,
+        MCCMNC : 34004, // 34009 parfois
         label : "Free",
         nomCommercial : "Free Mobile",
         compagnie : "frca",
@@ -352,7 +356,11 @@ var operateurs = {
             BC : "#cf6666",
             TBC : "#af0000",
             ITI : "#ebc1c1",
-            RP : "#cf6666"
+            RP : "#cf6666",
+            //ajout sites 5G
+            Sites700 : "#ebc1c1",
+            Sites2100 : "#cf6666",
+            Sites3500 : "#af0000"
         }
     },
     orange_ocean_indien : {
@@ -376,7 +384,11 @@ var operateurs = {
             BC : "#ffa366",
             TBC : "#ff6600",
             ITI : "#ffdac1",
-            RP : "#ffa366"
+            RP : "#ffa366",
+            //ajout sites 5G
+            Sites700 : "#ffdac1",
+            Sites2100 : "#ffa366",
+            Sites3500 : "#ff6600"
         }
     },
     free_ocean_indien : {
@@ -400,7 +412,11 @@ var operateurs = {
             BC : "#66C766",
             TBC : "#00A200",
             ITI : "#c1e8c1",
-            RP : "#66C766"
+            RP : "#66C766",
+            //ajout sites 5G
+            Sites700 : "#c1e8c1",
+            Sites2100 : "#66C766",
+            Sites3500 : "#00A200"
         }
         //Free Mobile
     }
