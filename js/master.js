@@ -132,6 +132,22 @@ function initMap(){
 
   mbData.layers.forEach(function(mbLayer){addMbLayer(mbLayer.id);});
 
+  map.addSource('proto', {
+    type: 'vector',
+    url: 'pmtiles://tiles/couverture.pmtiles',
+  });
+
+  map.addLayer({
+    id: 'my-custom-layer',
+    type: 'fill',
+    source: 'proto',
+    'source-layer': 'couverture',
+    paint: {
+      'fill-color': 'blue',
+      'fill-opacity': 0.5,
+    },
+  });
+
   randomOperateur();
   activerMenuParDefaut();
 

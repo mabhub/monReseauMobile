@@ -1,0 +1,31 @@
+rm -f ./tmp
+
+mkdir -p ./tmp
+mkdir -p ./tiles
+
+cd tmp
+
+wget https://files.data.gouv.fr/arcep_donnees/mobile/couvertures_theoriques/2022_T4/Metropole/00_Metropole/2022_T4_couv_Metropole_FREE_4G_data.7z
+7z -aoa x 2022_T4_couv_Metropole_FREE_4G_data.7z
+
+ogr2ogr \
+  -simplify 0.00001 \
+  -f GeoJSONSeq \
+  ./couverture.geojson \
+  ./2022_T4_couv_Metropole_FREE_4G_data.gpkg
+
+cd ..
+
+docker run -it --rm \
+  --env TIPPECANOE_MAX_THREADS=12 \
+  --user 1000:1000 \
+  -v .:/data tippecanoe:latest \
+  tippecanoe --force \
+  --layer=couverture \
+  --read-parallel \
+  --no-tile-compression \
+  --maximum-zoom=g \
+  --low-detail=11 \
+  --drop-rate=1.5 \
+  --output=/data/tiles/couverture.pmtiles \
+  /data/tmp/couverture.geojson
